@@ -1,18 +1,27 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "todoist---enough",
-  "title": "ToDoIst - Enough",
-  "description": "Enough shows your completed Todoist tasks for the day, so you can focus on what you’ve accomplished, not what you have left.",
-  "icon": "extension-icon.png",
+  "title": "ToDoist - Enough",
+  "description": "Enough shows your completed Todoist tasks for the day, so you can focus on what you've accomplished, not what you have left.",
+  "icon": "enough-icon.png",
   "author": "pjtat5",
   "license": "MIT",
   "commands": [
     {
-      "name": "show-done-list",
-      "title": "Show Done List",
-      "subtitle": "You’ve done enough for today",
+      "name": "todoist-enough",
+      "title": "ToDoist - Enough",
+      "subtitle": "You've done enough for today", 
       "description": "Displays your completed Todoist tasks for the day",
       "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "todoistApiToken",
+      "title": "Todoist API Token",
+      "description": "Your Todoist API token (found in Todoist Settings > Integrations > API token)",
+      "type": "password",
+      "required": true
     }
   ],
   "dependencies": {
