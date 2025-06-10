@@ -8,10 +8,17 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "todoist-enough",
-      "title": "ToDoist - Enough",
-      "subtitle": "You've done enough for today", 
-      "description": "Displays your completed Todoist tasks for the day",
+      "name": "see-daily-completed-tasks",
+      "title": "See Daily Completed Tasks",
+      "subtitle": "What have you done today?",
+      "description": "Shows your completed Todoist tasks for the day",
+      "mode": "view"
+    },
+    {
+      "name": "see-weekly-completed-tasks",
+      "title": "See Weekly Completed Tasks",
+      "subtitle": "What have you done this week?",
+      "description": "Shows your completed Todoist tasks for the week",
       "mode": "view"
     }
   ],
