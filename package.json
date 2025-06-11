@@ -29,6 +29,68 @@
       "description": "Your Todoist API token (found in Todoist Settings > Integrations > API token)",
       "type": "password",
       "required": true
+    },
+    {
+      "name": "enableDailyTaskTarget",
+      "title": "Enable Daily Task Target",
+      "description": "Show progress towards daily task completion target",
+      "type": "checkbox",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "dailyTaskTarget",
+      "title": "Daily Task Target",
+      "description": "Number of tasks you aim to complete each day",
+      "type": "textfield",
+      "default": "5",
+      "required": false,
+      "minimum": 1,
+      "maximum": 100
+    },
+    {
+      "name": "enableWeeklyTaskTarget",
+      "title": "Enable Weekly Task Target",
+      "description": "Show progress towards weekly task completion target",
+      "type": "checkbox",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "weeklyTaskTarget",
+      "title": "Weekly Task Target", 
+      "description": "Number of tasks you aim to complete each week",
+      "type": "textfield",
+      "required": false,
+      "default": "25",
+      "minimum": 1,
+      "maximum": 500
+    },
+    {
+      "name": "enableDailyStoryPointsTarget",
+      "title": "Enable Daily Story Points Target",
+      "description": "Show progress towards daily story points completion target",
+      "type": "checkbox",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "storyPointsKeyword",
+      "title": "Story Points Keyword",
+      "description": "The keyword to look for in labels to identify story points (e.g., 'Story Points:')",
+      "type": "textfield",
+      "default": "Story Points:",
+      "required": false
+    },
+    {
+      "name": "dailyStoryPointsTarget",
+      "title": "Daily Story Points Target",
+      "description": "Your target number of story points to complete each day",
+      "type": "textfield",
+      "default": "10",
+      "required": false,
+      "minimum": 1,
+      "maximum": 500
     }
   ],
   "dependencies": {
