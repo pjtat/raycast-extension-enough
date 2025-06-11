@@ -13,13 +13,6 @@
       "subtitle": "What have you done today?",
       "description": "Shows your completed Todoist tasks for the day",
       "mode": "view"
-    },
-    {
-      "name": "see-weekly-completed-tasks",
-      "title": "See Weekly Completed Tasks",
-      "subtitle": "What have you done this week?",
-      "description": "Shows your completed Todoist tasks for the week",
-      "mode": "view"
     }
   ],
   "preferences": [
@@ -47,24 +40,6 @@
       "required": false,
       "minimum": 1,
       "maximum": 100
-    },
-    {
-      "name": "enableWeeklyTaskTarget",
-      "title": "Enable Weekly Task Target",
-      "description": "Show progress towards weekly task completion target",
-      "type": "checkbox",
-      "default": false,
-      "required": false
-    },
-    {
-      "name": "weeklyTaskTarget",
-      "title": "Weekly Task Target", 
-      "description": "Number of tasks you aim to complete each week",
-      "type": "textfield",
-      "required": false,
-      "default": "25",
-      "minimum": 1,
-      "maximum": 500
     },
     {
       "name": "enableDailyStoryPointsTarget",
