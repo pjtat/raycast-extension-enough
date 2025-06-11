@@ -79,7 +79,7 @@
       "title": "Story Points Keyword",
       "description": "The keyword to look for in labels to identify story points (e.g., 'Story Points:')",
       "type": "textfield",
-      "default": "Story Points:",
+      "default": "Points:",
       "required": false
     },
     {

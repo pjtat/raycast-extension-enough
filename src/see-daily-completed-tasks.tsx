@@ -1,9 +1,15 @@
 import { List, Toast, showToast, Color, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getPreferenceValues } from "@raycast/api";
+import { ACHIEVEMENT_QUOTES } from "./constants/quotes";
 
 interface Preferences {
   todoistApiToken: string;
+  storyPointsKeyword: string;
+  enableDailyStoryPointsTarget: boolean;
+  dailyStoryPointsTarget: string;
+  enableDailyTaskTarget: boolean;
+  dailyTaskTarget: string;
 }
 
 interface Task {
@@ -13,6 +19,7 @@ interface Task {
   project_id: string;
   priority: number;
   user_id: string;
+  labels: string[];
 }
 
 interface Project {
@@ -47,14 +54,25 @@ const formatDate = (dateString: string) => {
 const getPriorityIcon = (priority: number) => {
   switch (priority) {
     case 4:
-      return { source: { light: "priority-4.png", dark: "priority-4.png" } };
-    case 3:
-      return { source: { light: "priority-3.png", dark: "priority-3.png" } };
-    case 2:
-      return { source: { light: "priority-2.png", dark: "priority-2.png" } };
-    default:
       return { source: { light: "priority-1.png", dark: "priority-1.png" } };
+    case 3:
+      return { source: { light: "priority-2.png", dark: "priority-2.png" } };
+    case 2:
+      return { source: { light: "priority-3.png", dark: "priority-3.png" } };
+    default:
+      return { source: { light: "priority-4.png", dark: "priority-4.png" } };
   }
+};
+
+// Helper function to extract story points from labels
+const getStoryPoints = (labels: string[], keyword: string): number | null => {
+  const storyPointLabel = labels.find(label => label.startsWith(keyword));
+  if (!storyPointLabel) return null;
+
+  const pointsStr = storyPointLabel.substring(keyword.length).trim();
+  const points = Number(pointsStr);
+  
+  return !isNaN(points) && points > 0 ? points : null;
 };
 
 export default function Command() {
@@ -62,6 +80,14 @@ export default function Command() {
   const [isLoading, setIsLoading] = useState(true);
   const preferences = getPreferenceValues<Preferences>();
   const [userId, setUserId] = useState<string>();
+
+  // Calculate total story points for a list of tasks
+  const calculateTotalPoints = (tasks: Task[]): number => {
+    return tasks.reduce((total, task) => {
+      const points = getStoryPoints(task.labels, preferences.storyPointsKeyword);
+      return total + (points || 0);
+    }, 0);
+  };
 
   useEffect(() => {
     async function fetchUserId() {
@@ -187,7 +213,7 @@ export default function Command() {
         }, {});
 
         Object.values(grouped).forEach(project => {
-          project.tasks.sort((a, b) => a.priority - b.priority);
+          project.tasks.sort((a, b) => b.priority - a.priority);
         });
 
         setTasksByProject(grouped);
@@ -212,32 +238,102 @@ export default function Command() {
       searchBarPlaceholder="Search completed tasks..."
     >
       <List.Section title="🎯 Daily Summary">
-        <List.Item 
-          title={`${Object.values(tasksByProject).reduce((total, project) => total + project.tasks.length, 0)} tasks completed today`}
-          icon={Icon.Dot}
-        />
+        {(() => {
+          const totalTasks = Object.values(tasksByProject).reduce((total, project) => total + project.tasks.length, 0);
+          const totalPoints = Object.values(tasksByProject).reduce((total, project) => total + calculateTotalPoints(project.tasks), 0);
+          
+          const showTaskTarget = preferences.enableDailyTaskTarget === true;
+          const taskTarget = showTaskTarget ? parseInt(preferences.dailyTaskTarget || "0", 10) : 0;
+          
+          const showPointsTarget = preferences.enableDailyStoryPointsTarget === true;
+          const pointsTarget = showPointsTarget ? parseInt(preferences.dailyStoryPointsTarget || "0", 10) : 0;
+
+          const taskTargetMet = showTaskTarget && taskTarget > 0 && totalTasks >= taskTarget;
+          const pointsTargetMet = showPointsTarget && pointsTarget > 0 && totalPoints >= pointsTarget;
+          const allTargetsMet = (showTaskTarget ? taskTargetMet : true) && (showPointsTarget ? pointsTargetMet : true);
+          
+          const randomQuote = ACHIEVEMENT_QUOTES[Math.floor(Math.random() * ACHIEVEMENT_QUOTES.length)];
+          
+          return (
+            <>
+              <List.Item 
+                title={showTaskTarget 
+                  ? `${totalTasks}/${taskTarget} tasks completed today`
+                  : `${totalTasks} tasks completed today`}
+                icon={showTaskTarget 
+                  ? {
+                      source: taskTargetMet ? Icon.CheckCircle : Icon.Circle,
+                      tintColor: taskTargetMet ? Color.Blue : undefined
+                    }
+                  : Icon.Dot}
+                accessories={showTaskTarget ? [
+                  {
+                    text: taskTarget > 0 
+                      ? `${Math.round((totalTasks / taskTarget) * 100)}% of daily target`
+                      : "No target set",
+                    tooltip: "Progress towards daily task target",
+                    icon: taskTargetMet ? { source: Icon.Dot, tintColor: Color.Blue } : undefined
+                  }
+                ] : []}
+              />
+              {showPointsTarget && (
+                <List.Item
+                  title={`${totalPoints}/${pointsTarget} story points completed`}
+                  icon={{
+                    source: pointsTargetMet ? Icon.CheckCircle : Icon.Circle,
+                    tintColor: pointsTargetMet ? Color.Blue : undefined
+                  }}
+                  accessories={[
+                    {
+                      text: pointsTarget > 0 
+                        ? `${Math.round((totalPoints / pointsTarget) * 100)}% of daily target`
+                        : "No target set",
+                      tooltip: "Progress towards daily story points target",
+                      icon: pointsTargetMet ? { source: Icon.Dot, tintColor: Color.Blue } : undefined
+                    }
+                  ]}
+                />
+              )}
+              {allTargetsMet && (showTaskTarget || showPointsTarget) && (
+                <List.Item
+                  title={`${randomQuote.text} — ${randomQuote.author}`}
+                  icon={{
+                    source: Icon.QuoteBlock,
+                    tintColor: Color.Yellow
+                  }}
+                />
+              )}
+            </>
+          );
+        })()}
       </List.Section>
 
-      {Object.entries(tasksByProject).map(([projectId, { projectName, tasks }]) => (
-        <List.Section 
-          key={projectId} 
-          title={`${projectName} (${tasks.length})`}
-        >
-          {tasks.map((task) => (
-            <List.Item
-              key={task.id}
-              title={task.content}
-              icon={getPriorityIcon(task.priority)}
-              accessories={[
-                {
-                  text: formatDate(task.completed_at),
-                  tooltip: "Completion Date"
-                }
-              ]}
-            />
-          ))}
-        </List.Section>
-      ))}
+      {Object.entries(tasksByProject).map(([projectId, { projectName, tasks }]) => {
+        const projectPoints = preferences.enableDailyStoryPointsTarget ? calculateTotalPoints(tasks) : 0;
+        return (
+          <List.Section 
+            key={projectId} 
+            title={`${projectName} (${tasks.length} tasks${projectPoints > 0 ? ` | ${projectPoints} points` : ''})`}
+          >
+            {tasks.map((task) => {
+              const storyPoints = preferences.enableDailyStoryPointsTarget ? getStoryPoints(task.labels, preferences.storyPointsKeyword) : null;
+              return (
+                <List.Item
+                  key={task.id}
+                  title={task.content}
+                  icon={getPriorityIcon(task.priority)}
+                  accessories={storyPoints !== null ? [
+                    {
+                      text: `${storyPoints} points`,
+                      tooltip: "Story Points"
+                    }
+                  ] : []}
+                />
+              );
+            })}
+          </List.Section>
+        );
+      })}
     </List>
   );
 }
