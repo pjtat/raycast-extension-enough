@@ -46,6 +46,12 @@ const getPriorityIcon = (priority: number) => {
   }
 };
 
+// Helper function to format date as "Jun 5"
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
 export default function Command() {
   const [tasksByProject, setTasksByProject] = useState<TasksByProject>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -193,7 +199,7 @@ export default function Command() {
               icon={getPriorityIcon(task.priority)}
               accessories={[
                 {
-                  text: new Date(task.completed_at).toLocaleDateString(),
+                  text: formatDate(task.completed_at),
                   tooltip: "Completion Date"
                 }
               ]}
