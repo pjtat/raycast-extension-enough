@@ -12,6 +12,7 @@ interface Task {
   completed_at: string;
   project_id: string;
   priority: number;
+  user_id: string;
   project_name?: string;
   labels: string[];
 }
@@ -30,6 +31,12 @@ interface TasksByProject {
   [projectId: string]: {
     projectName: string;
     tasks: Task[];
+  };
+}
+
+interface SyncResponse {
+  user: {
+    id: string;
   };
 }
 
@@ -56,8 +63,30 @@ export default function Command() {
   const [tasksByProject, setTasksByProject] = useState<TasksByProject>({});
   const [isLoading, setIsLoading] = useState(true);
   const preferences = getPreferenceValues<Preferences>();
+  const [userId, setUserId] = useState<string>();
 
   useEffect(() => {
+    async function fetchUserId() {
+      const response = await fetch('https://api.todoist.com/api/v1/sync', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${preferences.todoistApiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sync_token: '*',
+          resource_types: ['user'],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user details');
+      }
+
+      const data = await response.json() as SyncResponse;
+      return data.user.id;
+    }
+
     async function fetchProjectDetails(projectId: string): Promise<Project> {
       const response = await fetch(
         `https://api.todoist.com/api/v1/projects/${projectId}`,
@@ -119,12 +148,15 @@ export default function Command() {
 
     async function fetchCompletedTasks() {
       try {
+        const currentUserId = await fetchUserId();
+        setUserId(currentUserId);
+
         const allTasks = await fetchAllCompletedTasks();
         
-        // Get unique project IDs
-        const projectIds = [...new Set(allTasks.map(task => task.project_id))];
+        const userTasks = allTasks.filter(task => task.user_id === currentUserId);
         
-        // Fetch project details for each unique project ID
+        const projectIds = [...new Set(userTasks.map(task => task.project_id))];
+        
         const projectDetails = await Promise.all(
           projectIds.map(async (projectId) => {
             try {
@@ -136,13 +168,11 @@ export default function Command() {
           })
         );
 
-        // Create a map of project IDs to project names
         const projectMap = Object.fromEntries(
           projectDetails.map(project => [project.id, project.name])
         );
 
-        // Group tasks by project
-        const grouped = allTasks.reduce<TasksByProject>((acc, task) => {
+        const grouped = userTasks.reduce<TasksByProject>((acc, task) => {
           const projectId = task.project_id;
           if (!acc[projectId]) {
             acc[projectId] = {
@@ -154,7 +184,6 @@ export default function Command() {
           return acc;
         }, {});
 
-        // Sort tasks by priority within each project (lowest priority first)
         Object.values(grouped).forEach(project => {
           project.tasks.sort((a, b) => a.priority - b.priority);
         });
