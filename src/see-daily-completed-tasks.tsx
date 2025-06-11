@@ -1,4 +1,4 @@
-import { List, Toast, showToast, Color, Icon } from "@raycast/api";
+import { List, Toast, showToast, Color, Icon, open, Action, ActionPanel } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getPreferenceValues } from "@raycast/api";
 import { ACHIEVEMENT_QUOTES } from "./constants/quotes";
@@ -328,6 +328,19 @@ export default function Command() {
                       tooltip: "Story Points"
                     }
                   ] : []}
+                  actions={
+                    <ActionPanel>
+                      <Action.OpenInBrowser
+                        title="Open in Browser"
+                        url={`https://todoist.com/app/task/${task.id}`}
+                      />
+                      <Action.Open
+                        title="Open in Todoist App"
+                        target={`todoist://task?id=${task.id}`}
+                        application="Todoist"
+                      />
+                    </ActionPanel>
+                  }
                 />
               );
             })}
