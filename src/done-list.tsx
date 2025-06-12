@@ -5,9 +5,9 @@ import { ACHIEVEMENT_QUOTES } from "./constants/quotes";
 
 interface Preferences {
   todoistApiToken: string;
-  storyPointsKeyword: string;
-  enableDailyStoryPointsTarget: boolean;
-  dailyStoryPointsTarget: string;
+  pointsKeyword: string;
+  enableDailyPointsTarget: boolean;
+  dailyPointsTarget: string;
   enableDailyTaskTarget: boolean;
   dailyTaskTarget: string;
 }
@@ -64,12 +64,12 @@ const getPriorityIcon = (priority: number) => {
   }
 };
 
-// Helper function to extract story points from labels
-const getStoryPoints = (labels: string[], keyword: string): number | null => {
-  const storyPointLabel = labels.find(label => label.startsWith(keyword));
-  if (!storyPointLabel) return null;
+// Helper function to extract points from labels
+const getPoints = (labels: string[], keyword: string): number | null => {
+  const pointsLabel = labels.find(label => label.startsWith(keyword));
+  if (!pointsLabel) return null;
 
-  const pointsStr = storyPointLabel.substring(keyword.length).trim();
+  const pointsStr = pointsLabel.substring(keyword.length).trim();
   const points = Number(pointsStr);
   
   return !isNaN(points) && points > 0 ? points : null;
@@ -81,10 +81,10 @@ export default function Command() {
   const preferences = getPreferenceValues<Preferences>();
   const [userId, setUserId] = useState<string>();
 
-  // Calculate total story points for a list of tasks
+  // Calculate total points for a list of tasks
   const calculateTotalPoints = (tasks: Task[]): number => {
     return tasks.reduce((total, task) => {
-      const points = getStoryPoints(task.labels, preferences.storyPointsKeyword);
+      const points = getPoints(task.labels, preferences.pointsKeyword);
       return total + (points || 0);
     }, 0);
   };
@@ -245,8 +245,8 @@ export default function Command() {
           const showTaskTarget = preferences.enableDailyTaskTarget === true;
           const taskTarget = showTaskTarget ? parseInt(preferences.dailyTaskTarget || "0", 10) : 0;
           
-          const showPointsTarget = preferences.enableDailyStoryPointsTarget === true;
-          const pointsTarget = showPointsTarget ? parseInt(preferences.dailyStoryPointsTarget || "0", 10) : 0;
+          const showPointsTarget = preferences.enableDailyPointsTarget === true;
+          const pointsTarget = showPointsTarget ? parseInt(preferences.dailyPointsTarget || "0", 10) : 0;
 
           const taskTargetMet = showTaskTarget && taskTarget > 0 && totalTasks >= taskTarget;
           const pointsTargetMet = showPointsTarget && pointsTarget > 0 && totalPoints >= pointsTarget;
@@ -278,7 +278,7 @@ export default function Command() {
               />
               {showPointsTarget && (
                 <List.Item
-                  title={`${totalPoints}/${pointsTarget} story points completed`}
+                  title={`${totalPoints}/${pointsTarget} points completed`}
                   icon={{
                     source: pointsTargetMet ? Icon.CheckCircle : Icon.Circle,
                     tintColor: pointsTargetMet ? Color.Blue : undefined
@@ -288,7 +288,7 @@ export default function Command() {
                       text: pointsTarget > 0 
                         ? `${Math.round((totalPoints / pointsTarget) * 100)}% of daily target`
                         : "No target set",
-                      tooltip: "Progress towards daily story points target",
+                      tooltip: "Progress towards daily points target",
                       icon: pointsTargetMet ? { source: Icon.Dot, tintColor: Color.Blue } : undefined
                     }
                   ]}
@@ -309,23 +309,23 @@ export default function Command() {
       </List.Section>
 
       {Object.entries(tasksByProject).map(([projectId, { projectName, tasks }]) => {
-        const projectPoints = preferences.enableDailyStoryPointsTarget ? calculateTotalPoints(tasks) : 0;
+        const projectPoints = preferences.enableDailyPointsTarget ? calculateTotalPoints(tasks) : 0;
         return (
           <List.Section 
             key={projectId} 
             title={`${projectName} (${tasks.length} tasks${projectPoints > 0 ? ` | ${projectPoints} points` : ''})`}
           >
             {tasks.map((task) => {
-              const storyPoints = preferences.enableDailyStoryPointsTarget ? getStoryPoints(task.labels, preferences.storyPointsKeyword) : null;
+              const points = preferences.enableDailyPointsTarget ? getPoints(task.labels, preferences.pointsKeyword) : null;
               return (
                 <List.Item
                   key={task.id}
                   title={task.content}
                   icon={getPriorityIcon(task.priority)}
-                  accessories={storyPoints !== null ? [
+                  accessories={points !== null ? [
                     {
-                      text: `${storyPoints} points`,
-                      tooltip: "Story Points"
+                      text: `${points} points`,
+                      tooltip: "Points"
                     }
                   ] : []}
                   actions={

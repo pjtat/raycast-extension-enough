@@ -1,16 +1,16 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "todoist---enough",
-  "title": "ToDoist - Enough",
-  "description": "Enough shows your completed Todoist tasks for the day, so you can focus on what you've accomplished, not what you have left.",
-  "icon": "enough-icon.png",
+  "name": "todoist-done-list",
+  "title": "ToDoist - Done List",
+  "description": "Done List is a simple extension that shows your completed Todoist tasks for the day, so you can focus on what you've accomplished, not what you have left.",
+  "icon": "done-list-icon.png",
   "author": "pjtat5",
   "license": "MIT",
   "commands": [
     {
-      "name": "see-daily-completed-tasks",
-      "title": "See Daily Completed Tasks",
-      "subtitle": "What have you done today?",
+      "name": "done-list",
+      "title": "Done List",
+      "subtitle": "See your completed tasks for the day",
       "description": "Shows your completed Todoist tasks for the day",
       "mode": "view"
     }
@@ -42,25 +42,25 @@
       "maximum": 100
     },
     {
-      "name": "enableDailyStoryPointsTarget",
-      "title": "Enable Daily Story Points Target",
-      "description": "Show progress towards daily story points completion target",
+      "name": "enableDailyPointsTarget",
+      "title": "Enable Daily Points Target",
+      "description": "Show progress towards daily points completion target",
       "type": "checkbox",
       "default": false,
       "required": false
     },
     {
-      "name": "storyPointsKeyword",
-      "title": "Story Points Keyword",
-      "description": "The keyword to look for in labels to identify story points (e.g., 'Story Points:')",
+      "name": "pointsKeyword",
+      "title": "Points Keyword",
+      "description": "The keyword to look for in labels to identify points (e.g., 'Points:')",
       "type": "textfield",
       "default": "Points:",
       "required": false
     },
     {
-      "name": "dailyStoryPointsTarget",
-      "title": "Daily Story Points Target",
-      "description": "Your target number of story points to complete each day",
+      "name": "dailyPointsTarget",
+      "title": "Daily Points Target",
+      "description": "Your target number of points to complete each day",
       "type": "textfield",
       "default": "10",
       "required": false,
