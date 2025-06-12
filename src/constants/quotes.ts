@@ -6,14 +6,14 @@ interface Quote {
 export const ACHIEVEMENT_QUOTES: Quote[] = [
   {
     text: "Nature does not hurry, yet everything is accomplished.",
-    author: "Lao Tzu"
+    author: "Lao Tzu",
   },
   {
     text: "It is not that we have a short time to live, but that we waste much of it.",
-    author: "Seneca"
+    author: "Seneca",
   },
   {
     text: "If you seek tranquility, do less. Or more accurately, do what's essential.",
-    author: "Marcus Aurelius"
-  }
+    author: "Marcus Aurelius",
+  },
 ];
