@@ -216,7 +216,7 @@ export default function Command() {
     }
 
     fetchCompletedTasks();
-  }, []);
+  }, [preferences]);
 
   return (
     <List
